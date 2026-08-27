@@ -20,6 +20,7 @@ app = typer.Typer(
 # Account setup & verification (M1)
 app.command()(auth.login)
 app.command()(auth.whoami)
+app.command()(auth.set_name)
 app.command()(auth.logout)
 
 # Keep the tool current

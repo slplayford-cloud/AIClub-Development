@@ -87,3 +87,12 @@ create policy "members can update own row"
     on public.members for update
     using (auth.uid() = id)
     with check (auth.uid() = id);
+
+-- ---------------------------------------------------------------------------
+-- Table-level privileges. RLS decides *which rows* the authenticated role may
+-- touch, but the role still needs base table privileges to touch it at all.
+-- Tables made in the SQL Editor (unlike the Table Editor) don't get these
+-- automatically. Only select+update: inserts happen via the SECURITY DEFINER
+-- trigger above, and members never delete their profile.
+-- ---------------------------------------------------------------------------
+grant select, update on public.members to authenticated;

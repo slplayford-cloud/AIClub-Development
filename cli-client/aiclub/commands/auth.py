@@ -127,6 +127,29 @@ def whoami() -> None:
     console.print(f"[bold]Member since:[/] {member['created_at']}")
 
 
+def set_name(
+    name: str = typer.Argument(..., help='Your full name, e.g. "Stephen Playford".'),
+) -> None:
+    """Set the full name shown on your member profile."""
+    cfg = _load_config_or_exit()
+
+    session = load_session()
+    if session is None:
+        error("You're not logged in. Run:  aiclub login")
+        raise typer.Exit(code=1)
+
+    try:
+        client = get_authed_client(cfg, session)
+        client.table("members").update({"full_name": name}).eq(
+            "id", session.user_id
+        ).execute()
+    except Exception as exc:  # noqa: BLE001
+        error(f"Could not update your name: {exc}")
+        raise typer.Exit(code=1)
+
+    success(f"Your name is now: {name}")
+
+
 def logout() -> None:
     """Log out and delete your saved session."""
     session = load_session()
