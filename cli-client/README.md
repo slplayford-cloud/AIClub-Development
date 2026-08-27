@@ -7,21 +7,29 @@ to review in the Supabase dashboard.
 
 ## Install (members)
 
-Requires [uv](https://docs.astral.sh/uv/) — one tool, no separate Python setup:
+Requires [uv](https://docs.astral.sh/uv/): 
+
+How to install uv package manager:
+
+macOS and Linux:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 
 ```bash
-uv tool install aiclub          # once published
-# or, from a checkout of this repo:
-uv tool install ./cli-client
+uv tool install "git+https://github.com/slplayford-cloud/AIClub-Development#subdirectory=cli-client"
 ```
 
 Then:
 
 ```bash
 aiclub status                   # check the connection
-aiclub login you@university.edu # verify with an emailed code   (M1)
-aiclub assignments list         # browse assignments            (M2)
-aiclub submit hw1 ./solution.py # submit a file or folder       (M3)
+aiclub login                    # sign in with your @nd.edu Google account (M1)
+aiclub whoami                   # show who you're logged in as             (M1)
+aiclub update                   # update aiclub to the latest version
+aiclub assignments list         # browse assignments                       (M2)
+aiclub submit hw1 ./solution.py # submit a file or folder                  (M3)
 ```
 
 ## Develop
@@ -35,18 +43,6 @@ uv run pytest                   # run tests
 
 ### Configuration
 
-The Supabase URL, anon key, and allowed email domain are club-wide constants baked
-into the package (the anon key is public by design). For local development you can
-override them with environment variables:
-
-```bash
-export AICLUB_SUPABASE_URL=https://<project>.supabase.co
-export AICLUB_SUPABASE_ANON_KEY=<anon-key>
-export AICLUB_ALLOWED_DOMAIN=university.edu
-```
-
-…or in `~/.config/aiclub/config.toml`:
-
 ```toml
 supabase_url = "https://<project>.supabase.co"
 supabase_anon_key = "<anon-key>"
@@ -58,6 +54,6 @@ allowed_domain = "university.edu"
 Built in weekend-sized milestones:
 
 - [x] **M0** — Project scaffold + Supabase connection (`aiclub status`)
-- [ ] **M1** — Account setup & email verification (`login`, `whoami`, `logout`)
+- [ ] **M1** — Account setup via Google sign-in (`login`, `whoami`, `logout`) — see [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md)
 - [ ] **M2** — Browse assignments & workshops
 - [ ] **M3** — Code submission

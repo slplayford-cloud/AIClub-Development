@@ -6,6 +6,7 @@ import typer
 
 from . import __version__
 from .client import health_check
+from .commands import auth, update as update_cmd
 from .config import ConfigError, config_file, load_config
 from .output import console, error, info, mask
 
@@ -15,6 +16,14 @@ app = typer.Typer(
     no_args_is_help=True,
     add_completion=False,
 )
+
+# Account setup & verification (M1)
+app.command()(auth.login)
+app.command()(auth.whoami)
+app.command()(auth.logout)
+
+# Keep the tool current
+app.command()(update_cmd.update)
 
 
 def _version_callback(value: bool) -> None:

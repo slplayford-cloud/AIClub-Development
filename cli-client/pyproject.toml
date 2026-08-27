@@ -12,6 +12,9 @@ dependencies = [
     "httpx>=0.27",
 ]
 
+[tool.basedpyright]
+typeCheckingMode = "standard"
+
 [project.scripts]
 aiclub = "aiclub.cli:main"
 
