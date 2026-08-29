@@ -87,15 +87,53 @@ def login() -> None:
         raise typer.Exit(code=1)
 
     email = result.user.email or "(unknown email)"
-    save_session(
-        Session(
-            access_token=result.session.access_token,
-            refresh_token=result.session.refresh_token,
-            email=email,
-            user_id=result.user.id,
-        )
+    session = Session(
+        access_token=result.session.access_token,
+        refresh_token=result.session.refresh_token,
+        email=email,
+        user_id=result.user.id,
     )
+    save_session(session)
     success(f"Signed in as {email}.")
+
+    _prompt_and_save_name(cfg, session)
+
+
+def _prompt_and_save_name(cfg, session: Session) -> None:
+    """Ask the member to confirm/enter their full name after login.
+
+    Pre-fills with the current value (from their Google profile or a previous
+    login) so a returning member can just press Enter. Non-fatal: any error here
+    doesn't undo the login — they can always fix it later with `aiclub set-name`.
+    """
+    try:
+        client = get_authed_client(cfg, session)
+        response = (
+            client.table("members")
+            .select("full_name")
+            .eq("id", session.user_id)
+            .single()
+            .execute()
+        )
+        current = (response.data or {}).get("full_name")
+    except Exception:  # noqa: BLE001 - onboarding is best-effort
+        return
+
+    if current:
+        name = typer.prompt("Your full name", default=current).strip()
+    else:
+        name = typer.prompt("Your full name").strip()
+
+    if not name or name == (current or ""):
+        return
+
+    try:
+        client.table("members").update({"full_name": name}).eq(
+            "id", session.user_id
+        ).execute()
+        success(f"Saved your name as: {name}")
+    except Exception as exc:  # noqa: BLE001
+        error(f"Could not save your name: {exc}  (you can retry with `aiclub set-name`)")
 
 
 def whoami() -> None:
